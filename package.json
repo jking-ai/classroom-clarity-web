@@ -4,6 +4,8 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
+    "dev:full": "concurrently --names emu,astro --prefix-colors blue,green \"npm run emulators\" \"npm run dev\"",
+    "emulators": "firebase emulators:start",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
@@ -12,5 +14,8 @@
     "@tailwindcss/vite": "^4.2.0",
     "astro": "^5.17.1",
     "tailwindcss": "^4.2.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   }
 }
