@@ -2,7 +2,7 @@ import { onRequest } from 'firebase-functions/v2/https';
 import { defineSecret } from 'firebase-functions/params';
 import express from 'express';
 import cors from 'cors';
-import { createProxyMiddleware, fixRequestBody } from 'http-proxy-middleware';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 import type { ClientRequest, IncomingMessage } from 'http';
 
 const apiKey = defineSecret('<YOUR_API_KEY_SECRET>');
@@ -21,11 +21,16 @@ app.use(
     on: {
       proxyReq: (proxyReq: ClientRequest, req: IncomingMessage) => {
         proxyReq.setHeader('X-API-Key', apiKey.value());
-        // Firebase Functions v2 parses the request body before it reaches
-        // the proxy middleware, consuming the readable stream. fixRequestBody
-        // re-serialises req.body back onto the proxy request so the backend
-        // actually receives the POST data.
-        fixRequestBody(proxyReq, req);
+
+        // Firebase Functions v2 consumes the request body stream before it
+        // reaches the proxy middleware. We use rawBody (the untouched Buffer
+        // that Firebase provides) to re-write the original bytes — this
+        // preserves multipart boundaries, JSON, and any other content type.
+        const firebaseReq = req as IncomingMessage & { rawBody?: Buffer; body?: unknown };
+        if (firebaseReq.rawBody?.length) {
+          proxyReq.setHeader('Content-Length', firebaseReq.rawBody.length);
+          proxyReq.write(firebaseReq.rawBody);
+        }
       },
     },
   })
