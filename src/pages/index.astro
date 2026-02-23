@@ -31,6 +31,9 @@ import TopNav from '../components/TopNav.astro';
             <!-- JS will append Q&A exchanges here -->
         </div>
 
+        <!-- Rate limit banner -->
+        <div id="rate-limit-banner" class="hidden mx-auto w-full max-w-3xl"></div>
+
         <!-- Input bar (always visible, pinned to bottom) -->
         <div class="sticky bottom-0 bg-gradient-to-t from-white via-white to-transparent dark:from-background-dark dark:via-background-dark pt-6 pb-4">
             <form id="query-form" class="relative shadow-xl shadow-slate-200/50 dark:shadow-black/20 rounded-2xl bg-white dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 focus-within:ring-2 focus-within:ring-primary transition-all">
@@ -54,12 +57,38 @@ import TopNav from '../components/TopNav.astro';
     </main>
 
 <script>
+    class RateLimitError extends Error {
+        constructor() { super('Rate limit exceeded'); }
+    }
+
     const form = document.getElementById('query-form') as HTMLFormElement;
     const input = document.getElementById('query-input') as HTMLTextAreaElement;
     const submitBtn = document.getElementById('submit-btn') as HTMLButtonElement;
     const welcomeState = document.getElementById('welcome-state')!;
     const chatThread = document.getElementById('chat-thread')!;
     const exampleChips = document.querySelectorAll('.example-chip');
+
+    const rateLimitBanner = document.getElementById('rate-limit-banner')!;
+
+    // Load and display rate limit info
+    async function loadLimits() {
+        try {
+            const resp = await fetch('/api/v1/limits');
+            if (!resp.ok) return;
+            const data = await resp.json();
+            const { queryRequestsPerMinute } = data.rateLimit;
+            rateLimitBanner.innerHTML = `
+                <div class="flex items-center gap-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 px-3 py-2 text-xs text-slate-500 dark:text-slate-400 mb-2">
+                    <span class="material-symbols-outlined text-[16px]">speed</span>
+                    <span>${queryRequestsPerMinute} questions per minute</span>
+                </div>
+            `;
+            rateLimitBanner.classList.remove('hidden');
+        } catch (e) {
+            // Info banner is optional
+        }
+    }
+    loadLimits();
 
     // Enable/disable submit based on input
     input.addEventListener('input', () => {
@@ -129,6 +158,9 @@ import TopNav from '../components/TopNav.astro';
 
             const data = await resp.json();
             if (!resp.ok) {
+                if (resp.status === 429) {
+                    throw new RateLimitError();
+                }
                 throw new Error(data.message || `Request failed: ${resp.status}`);
             }
 
@@ -167,15 +199,27 @@ import TopNav from '../components/TopNav.astro';
                 </div>
             `;
         } catch (err) {
-            const errMsg = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
-            loadingEl.innerHTML = `
-                <div class="size-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shrink-0 shadow-lg mt-1">
-                    <span class="material-symbols-outlined text-white">info</span>
-                </div>
-                <div class="flex-1 py-2">
-                    <p class="text-slate-600 dark:text-slate-400 text-sm">${escapeHtml(errMsg)}</p>
-                </div>
-            `;
+            if (err instanceof RateLimitError) {
+                loadingEl.innerHTML = `
+                    <div class="size-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shrink-0 shadow-lg mt-1">
+                        <span class="material-symbols-outlined text-white">speed</span>
+                    </div>
+                    <div class="flex-1 py-2">
+                        <p class="text-amber-700 dark:text-amber-400 text-sm font-medium">Rate limit reached</p>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">You've sent too many questions. Please wait a minute and try again.</p>
+                    </div>
+                `;
+            } else {
+                const errMsg = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
+                loadingEl.innerHTML = `
+                    <div class="size-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shrink-0 shadow-lg mt-1">
+                        <span class="material-symbols-outlined text-white">info</span>
+                    </div>
+                    <div class="flex-1 py-2">
+                        <p class="text-slate-600 dark:text-slate-400 text-sm">${escapeHtml(errMsg)}</p>
+                    </div>
+                `;
+            }
         }
 
         chatThread.scrollTop = chatThread.scrollHeight;

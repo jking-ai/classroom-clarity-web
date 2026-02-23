@@ -20,6 +20,9 @@ const { title = "Classroom Clarity", bodyClass = "" } = Astro.props;
         }
       })();
     </script>
+    <script is:inline>
+      fetch('/api/v1/health').catch(function(){});
+    </script>
 </head>
 <body class={bodyClass}>
     <slot />
