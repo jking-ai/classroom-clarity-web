@@ -1,5 +1,14 @@
 {
   "projects": {
-    "default": "classroom-clarity-dev"
+    "default": "<YOUR_GCP_PROJECT>"
+  },
+  "targets": {
+    "<YOUR_GCP_PROJECT>": {
+      "hosting": {
+        "classroom-clarity": [
+          "classroom-clarity-ai"
+        ]
+      }
+    }
   }
 }
