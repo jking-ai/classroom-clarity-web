@@ -1,0 +1,124 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+<Layout title="Classroom Clarity - Upload Documents" bodyClass="bg-background-light dark:bg-background-dark font-display text-text-main dark:text-text-main-dark min-h-screen flex flex-col overflow-x-hidden">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-6 py-3 lg:px-10 sticky top-0 z-50">
+<div class="flex items-center gap-4">
+<a href="/" class="size-8 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-3xl">school</span>
+</a>
+<h2 class="text-xl font-bold leading-tight tracking-[-0.015em]">Classroom Clarity</h2>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-background-light dark:hover:bg-background-dark transition-colors text-text-secondary dark:text-text-secondary-dark">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-background-light dark:hover:bg-background-dark transition-colors text-text-secondary dark:text-text-secondary-dark">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="h-8 w-[1px] bg-border-light dark:bg-border-dark mx-2"></div>
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10 ring-2 ring-primary/20" data-alt="User profile avatar of a smiling woman" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBgu3uts_ow-D0p7jZFgMHe5s1EDqKJX_WDoVHSSJ4yxfZ9N-f2a4vnkI9yFJxg1iy-WyKN9dk8IQoIM_Z95_bw2wOUppZBfG3yR2bJ76-2cXwiFXOM9djhjNwGkHMkkyH8RnHaA8tUK9ParCe2sVAGYegCA9uPdFrXTF8p20KAHQhW9pvlmvRrj1AKHgafLVZY7kwIDnZrPJmobsEDkxbCU7PZc8eTeyO2JQFf6h0EVWfUBBpqHdevGTIUcfxU8Jo8mlJBKXtAYDwx");'></div>
+</div>
+</header>
+<main class="flex-1 flex flex-col lg:flex-row h-[calc(100vh-65px)]">
+<section class="flex-1 flex flex-col overflow-y-auto p-6 lg:p-10 lg:pr-6">
+<div class="max-w-3xl mx-auto w-full flex flex-col gap-8">
+<div class="flex flex-col gap-2">
+<h1 class="text-3xl lg:text-4xl font-black leading-tight tracking-tight text-text-main dark:text-text-main-dark">Upload New Material</h1>
+<p class="text-text-secondary dark:text-text-secondary-dark text-lg">Add textbooks, lecture notes, or handouts to the knowledge base.</p>
+</div>
+<form id="upload-form" action="/api/v1/documents" method="POST" enctype="multipart/form-data">
+    <div class="group relative flex flex-col items-center justify-center gap-6 rounded-xl border-2 border-dashed border-primary/30 hover:border-primary bg-surface-light dark:bg-surface-dark hover:bg-primary-light/30 dark:hover:bg-primary/10 transition-all duration-200 px-6 py-16 cursor-pointer" onclick="document.getElementById('file-upload').click()">
+        <div class="p-4 rounded-full bg-primary/10 dark:bg-primary/20 text-primary mb-2 group-hover:scale-110 transition-transform duration-200">
+        <span class="material-symbols-outlined text-4xl">cloud_upload</span>
+        </div>
+        <div class="flex flex-col items-center gap-1 text-center">
+        <p class="text-lg font-bold text-text-main dark:text-text-main-dark">Drag &amp; drop files here</p>
+        <p class="text-sm text-text-secondary dark:text-text-secondary-dark">Support for PDF files (Max 50MB)</p>
+        </div>
+        <input type="file" id="file-upload" name="file" class="hidden" accept=".pdf" onchange="document.getElementById('file-name').innerText = this.files[0]?.name || 'Browse Files'" />
+        <button type="button" class="mt-2 flex items-center justify-center rounded-lg h-10 px-6 bg-primary hover:bg-primary-dark text-white text-sm font-bold shadow-sm hover:shadow-md transition-all">
+                                <span id="file-name">Browse Files</span>
+                            </button>
+    </div>
+    
+    <div class="flex flex-col gap-6 bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-border-light dark:border-border-dark shadow-sm mt-8">
+        <div class="flex flex-col gap-2">
+        <label class="text-sm font-bold text-text-main dark:text-text-main-dark uppercase tracking-wider" for="doc-title">Document Title</label>
+        <input name="title" class="form-input w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-main dark:text-text-main-dark focus:ring-2 focus:ring-primary focus:border-transparent py-3 px-4 placeholder:text-text-secondary/50" id="doc-title" placeholder="e.g. Introduction to organic chemistry" type="text"/>
+        </div>
+        <div class="flex flex-col gap-2">
+        <label class="text-sm font-bold text-text-main dark:text-text-main-dark uppercase tracking-wider flex justify-between" for="doc-desc">
+                                    Description
+                                    <span class="text-text-secondary dark:text-text-secondary-dark font-normal normal-case text-xs opacity-70">(Optional)</span>
+        </label>
+        <textarea name="description" class="form-textarea w-full rounded-lg border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark text-text-main dark:text-text-main-dark focus:ring-2 focus:ring-primary focus:border-transparent py-3 px-4 placeholder:text-text-secondary/50 resize-none" id="doc-desc" placeholder="Add a brief description about the content to help the AI categorize it..." rows="4"></textarea>
+        </div>
+        <div class="flex items-center gap-4 pt-2">
+        <button type="submit" class="flex-1 lg:flex-none lg:w-48 bg-primary hover:bg-primary-dark text-white font-bold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined">auto_awesome</span>
+                                    Process Document
+                                </button>
+        <a href="/library" class="flex-1 lg:flex-none lg:w-32 bg-transparent hover:bg-background-light dark:hover:bg-background-dark text-text-secondary dark:text-text-secondary-dark font-bold py-3 px-6 rounded-lg border border-transparent hover:border-border-light dark:hover:border-border-dark transition-all flex items-center justify-center">
+                                    Cancel
+                                </a>
+        </div>
+    </div>
+</form>
+</div>
+</section>
+<aside class="w-full lg:w-96 bg-surface-light dark:bg-surface-dark border-t lg:border-t-0 lg:border-l border-border-light dark:border-border-dark h-auto lg:h-full overflow-y-auto">
+<div class="p-6 flex flex-col gap-6">
+<div class="flex items-center justify-between">
+<h3 class="text-lg font-bold text-text-main dark:text-text-main-dark">Recent Activity</h3>
+<button class="text-primary hover:text-primary-dark text-sm font-medium hover:underline">View All</button>
+</div>
+<div class="flex flex-col gap-4">
+<div class="group flex flex-col p-4 rounded-xl bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark hover:border-primary/50 transition-colors cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<div class="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg">
+<span class="material-symbols-outlined text-[20px]">description</span>
+</div>
+<span class="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-2 py-1 text-xs font-bold text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-600/20">
+                                Ready
+                            </span>
+</div>
+<h4 class="font-bold text-text-main dark:text-text-main-dark truncate mb-1">Physics_Module_1.docx</h4>
+<div class="flex items-center justify-between text-xs text-text-secondary dark:text-text-secondary-dark">
+<span>2 hours ago</span>
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">grid_view</span>
+                                142 chunks
+                            </span>
+</div>
+</div>
+</div>
+</div>
+<div class="p-6 pt-0 mt-auto">
+<div class="rounded-xl bg-primary/10 p-4 border border-primary/20">
+<div class="flex items-center gap-2 text-primary mb-2">
+<span class="material-symbols-outlined text-sm">lightbulb</span>
+<span class="text-xs font-bold uppercase tracking-wide">Pro Tip</span>
+</div>
+<p class="text-sm text-text-main dark:text-text-main-dark font-medium leading-relaxed">
+                        Uploading smaller chunks of text often yields better Q&amp;A results than single massive files.
+                    </p>
+</div>
+</div>
+</aside>
+</main>
+<script>
+    document.getElementById('upload-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+        try {
+            const resp = await fetch(form.action, { method: 'POST', body: formData });
+            if(resp.ok) { window.location.href = '/library'; }
+            else { alert('Upload failed. Please check the file and try again.'); }
+        } catch(err) {
+            console.error(err);
+        }
+    });
+</script>
+</Layout>
