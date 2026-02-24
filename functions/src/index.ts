@@ -7,7 +7,8 @@ import type { ClientRequest, IncomingMessage } from 'http';
 
 const apiKey = defineSecret('<YOUR_API_KEY_SECRET>');
 
-const API_TARGET = process.env.API_TARGET || 'https://<YOUR_CLOUD_RUN_URL>';
+const API_TARGET = process.env.API_TARGET;
+if (!API_TARGET) throw new Error('API_TARGET environment variable is required');
 
 const app = express();
 app.use(cors({ origin: true }));
