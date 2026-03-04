@@ -1,9 +1,9 @@
 {
   "projects": {
-    "default": "<YOUR_GCP_PROJECT>"
+    "default": "jking-ai-labs"
   },
   "targets": {
-    "<YOUR_GCP_PROJECT>": {
+    "jking-ai-labs": {
       "hosting": {
         "classroom-clarity": [
           "classroom-clarity-ai"

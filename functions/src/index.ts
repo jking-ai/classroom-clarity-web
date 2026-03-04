@@ -5,7 +5,7 @@ import cors from 'cors';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import type { ClientRequest, IncomingMessage } from 'http';
 
-const apiKey = defineSecret('<YOUR_API_KEY_SECRET>');
+const apiKey = defineSecret('classroom-clarity-api-key');
 const apiTarget = defineString('API_TARGET');
 
 let app: express.Express | null = null;
