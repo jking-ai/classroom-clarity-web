@@ -1,0 +1,73 @@
+---
+---
+
+<footer class="border-t border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-background-dark/60 backdrop-blur-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+    <span class="text-xs text-text-secondary dark:text-text-secondary-dark">&copy; {new Date().getFullYear()} Classroom Clarity</span>
+
+    <div class="flex items-center gap-2">
+      <span id="status-dot" class="relative flex size-2.5">
+        <span id="status-ping" class="absolute inline-flex h-full w-full rounded-full bg-slate-400 opacity-75 animate-ping"></span>
+        <span id="status-dot-inner" class="relative inline-flex rounded-full size-2.5 bg-slate-400"></span>
+      </span>
+      <span id="status-text" class="text-xs text-text-secondary dark:text-text-secondary-dark">Checking API...</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const dotInner = document.getElementById('status-dot-inner');
+  const ping = document.getElementById('status-ping');
+  const statusText = document.getElementById('status-text');
+
+  function setStatus(state: 'checking' | 'warming' | 'online' | 'offline') {
+    if (!dotInner || !ping || !statusText) return;
+
+    switch (state) {
+      case 'checking':
+        dotInner.className = 'relative inline-flex rounded-full size-2.5 bg-slate-400';
+        ping.className = 'absolute inline-flex h-full w-full rounded-full bg-slate-400 opacity-75 animate-ping';
+        statusText.textContent = 'Checking API...';
+        break;
+      case 'warming':
+        dotInner.className = 'relative inline-flex rounded-full size-2.5 bg-amber-400';
+        ping.className = 'absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75 animate-ping';
+        statusText.textContent = 'API warming up...';
+        break;
+      case 'online':
+        dotInner.className = 'relative inline-flex rounded-full size-2.5 bg-emerald-500';
+        ping.className = 'hidden';
+        statusText.textContent = 'API online';
+        break;
+      case 'offline':
+        dotInner.className = 'relative inline-flex rounded-full size-2.5 bg-red-500';
+        ping.className = 'hidden';
+        statusText.textContent = 'API offline';
+        break;
+    }
+  }
+
+  async function checkHealth() {
+    setStatus('checking');
+
+    const warmingTimer = setTimeout(() => setStatus('warming'), 2000);
+
+    try {
+      const res = await fetch('/api/v1/health');
+      clearTimeout(warmingTimer);
+
+      if (res.ok) {
+        const data = await res.json();
+        setStatus(data.status === 'UP' ? 'online' : 'offline');
+      } else {
+        setStatus('offline');
+      }
+    } catch {
+      clearTimeout(warmingTimer);
+      setStatus('offline');
+    }
+  }
+
+  checkHealth();
+  setInterval(checkHealth, 60000);
+</script>

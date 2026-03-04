@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Footer from '../components/Footer.astro';
 const { title = "Classroom Clarity", bodyClass = "" } = Astro.props;
 ---
 <!DOCTYPE html>
@@ -20,11 +21,11 @@ const { title = "Classroom Clarity", bodyClass = "" } = Astro.props;
         }
       })();
     </script>
-    <script is:inline>
-      fetch('/api/v1/health').catch(function(){});
-    </script>
 </head>
-<body class={bodyClass}>
-    <slot />
+<body class:list={[bodyClass, "min-h-screen flex flex-col"]}>
+    <div class="flex-1">
+      <slot />
+    </div>
+    <Footer />
 </body>
 </html>
