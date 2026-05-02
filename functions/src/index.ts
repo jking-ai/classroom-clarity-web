@@ -43,7 +43,7 @@ function getApp(): express.Express {
   return app;
 }
 
-export const apiProxy = onRequest(
+export const classroomClarityApi = onRequest(
   {
     region: 'us-central1',
     secrets: [apiKey],
